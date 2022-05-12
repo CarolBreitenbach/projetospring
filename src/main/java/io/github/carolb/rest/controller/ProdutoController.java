@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
+
 @RestController
 @RequestMapping("/api/produtos")
 public class ProdutoController {
@@ -26,14 +28,15 @@ public class ProdutoController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public Produto save(@RequestBody Produto produto) {
+    public Produto save(@RequestBody @Valid Produto produto) {
+
         return repository.save(produto);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(NO_CONTENT)
     public void update(@PathVariable Integer id,
-                       @RequestBody Produto produto) {
+                       @RequestBody @Valid Produto produto) {
         repository
                 .findById(id)
                 .map(p -> {
@@ -43,7 +46,6 @@ public class ProdutoController {
                 }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Produto não encontrado"));
     }
-
 
 
     @DeleteMapping("{id}")
@@ -66,14 +68,13 @@ public class ProdutoController {
     }
 
 
-
     @GetMapping
-    public List<Produto> find(Produto filtro ){
+    public List<Produto> find(Produto filtro) {
         ExampleMatcher matcher = ExampleMatcher
                 .matching()
                 .withIgnoreCase()
                 .withStringMatcher(
-                        ExampleMatcher.StringMatcher.CONTAINING );
+                        ExampleMatcher.StringMatcher.CONTAINING);
 
         Example example = Example.of(filtro, matcher);
         return repository.findAll(example);
